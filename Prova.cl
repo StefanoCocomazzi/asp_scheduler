@@ -1,34 +1,3 @@
-#const project_management = pmgt.
-#const full_week_1 = 2.
-
-corso(c1).
-corso(c2).
-corso(c3).
-corso(project_management).
-
-docente(doc1).
-docente(doc2).
-docente(doc3).
-docente(doc4).
-
-insegnamento(c1,  doc1,      10).
-insegnamento(c2,  doc2,      10).
-insegnamento(c3,  doc3,      10).
-insegnamento(project_management,  doc4,      6).
-
-
-
-%settimana_giorno(Settimana, Giorno).
-% settimana_giorno(4, 5..6).
-
-durata_lezione(1..4).
-giorno_ore(1..5,8).
-giorno_ore(6,5).
-giorno(1..6).
-settimana(1..4).
-settimana_giorno(1..4,5..6).
-settimana_giorno(full_week_1,1..4).
-
 {lezione(S, G, C, D, Len): insegnamento(C,D,_)} :- settimana_giorno(S,G), durata_lezione(Len).
 
 % =======================[durata_insegnamento]======================== %
@@ -81,18 +50,34 @@ numGiorniDiRecupero(Num) :- Num = #count { Ore,Settimana,Giorno: giornoRecupero(
 % =======================[/termine_project_management]===============================%
 
 % =======================[c1_prima_di_c2]===============================%
+% "• la prima lezione di c1 [aupm] 
+%  deve essere collocata prima che siano terminate le lezioni di c2 [lmkp] 
+minSettC1(Sett):- Sett = #min { S : lezione(S,_,aupm,_,_) }.
+minGioC1(Gio):- Gio = #min { G : lezione(Sett,G,aupm,_,_) }, minSettC1(Sett).
 
-% "• la prima lezione di c1 “Accessibilità e usabilità nella progettazione multimediale” 
-% deve essere collocata prima che siano terminate le lezioni di c2 “Linguaggi di markup”"
-:- lezione(Settimana1,_,c1,_,_), 
-    lezione(Settimana2,_,c2,_,_),
-    Settimana1 > Settimana2.
-:- lezione(Settimana1,G1,c1,_,_), 
-    lezione(Settimana2,G2,c2,_,_),
-    Settimana1 == Settimana2, G1>G2.
+maxSettC2(Sett):- Sett = #max { S : lezione(S,_,lmkp,_,_) }.
+maxGioC2(Gio):- Gio = #max { G : lezione(Sett,G,lmkp,_,_) }, maxSettC2(Sett).
+
+:- maxSettC2(SettC2),
+    minSettC1(SettC1),
+    SettC1 > SettC2.
+    
+:- maxSettC2(Sett), maxGioC2(GioC2),
+    minSettC1(Sett), minGioC1(GioC1),
+    GioC1 > GioC2.
 % =======================[/c1_prima_di_c2]==============================%
 
 
+% =======================[ordine_corsi]===============================%
+:- lezione(Settimana1,_,C1,_,_), 
+    lezione(Settimana2,_,C2,_,_),
+    ordineCorsi(C1,C2),
+    Settimana1 > Settimana2.
+:- lezione(Settimana1,G1,C1,_,_), 
+    lezione(Settimana2,G2,C2,_,_),
+    ordineCorsi(C1,C2),
+    Settimana1 == Settimana2, G1>G2.
+% =======================[/ordine_corsi]===============================%
 
 % #show settimana_giorno/2.
 % #show oreCorso/4.
@@ -102,6 +87,3 @@ numGiorniDiRecupero(Num) :- Num = #count { Ore,Settimana,Giorno: giornoRecupero(
 % #show giornoRecupero/3.
 % #show oreAlGiorno/3.
 % #show numGiorniDiRecupero/1.
-
-
-
