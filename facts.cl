@@ -1,4 +1,3 @@
-#const project_management = pmgt.
 #const full_week_1 = 7.
 #const full_week_2 = 16.
 #const num_settimane = 24.
@@ -108,4 +107,11 @@ pmgt,   pgdi;
 aeis,   edfd;
 edfd,   aesid;
 aeis,   g3d;
+).
+
+ordineAuspicabile(
+   fipp, prdb;
+   tsmd, ismm; 
+   cpcp, gsru;
+   tssw, psa1;
 ).
